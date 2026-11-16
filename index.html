@@ -1,0 +1,578 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#c2410c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Zaino Pronto">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<title>Zaino Pronto</title>
+<style>
+:root{
+  --bg:#f6f3ee;--card:#fff;--ink:#1f1a17;--muted:#6b625b;--line:#e6dfd6;
+  --accent:#c2410c;--accent-ink:#fff;--soft:#fbe9df;
+  --ok:#2f7d4f;--warn:#a86a10;--bad:#c0262d;
+  --ok-bg:#e3f3e9;--warn-bg:#fbefd5;--bad-bg:#fbe1e2;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#151312;--card:#211e1c;--ink:#f1ece6;--muted:#a79d94;--line:#38322d;
+  --accent:#f0703a;--accent-ink:#1a0d06;--soft:#3a2318;
+  --ok:#6cc891;--warn:#e6b25a;--bad:#f37d82;
+  --ok-bg:#1c3326;--warn-bg:#3a2e14;--bad-bg:#3d1c1e;
+}}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-tap-highlight-color:transparent}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none;padding:0}
+#app{max-width:520px;margin:0 auto;padding:20px 16px calc(96px + env(safe-area-inset-bottom))}
+h1{font-size:1.6rem;margin:4px 0 4px;letter-spacing:-.02em}
+h2{font-size:.8rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:22px 0 8px;font-weight:700}
+p{margin:0 0 12px}
+.sub{color:var(--muted);margin-bottom:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px}
+.bag{display:flex;gap:12px;align-items:center;width:100%;text-align:left;margin-bottom:10px}
+.bag .ico{font-size:1.8rem;width:52px;height:52px;border-radius:14px;background:var(--soft);display:grid;place-items:center;flex:none}
+.bag .info{flex:1;min-width:0}
+.bag .name{font-weight:700;font-size:1.05rem;overflow-wrap:anywhere}
+.small{font-size:.85rem;color:var(--muted)}
+.bar{height:6px;border-radius:3px;background:var(--line);margin:6px 0;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--ok);border-radius:3px}
+.badge{font-size:.75rem;font-weight:700;padding:3px 8px;border-radius:99px;white-space:nowrap;flex:none}
+.badge.ok{background:var(--ok-bg);color:var(--ok)}
+.badge.warn{background:var(--warn-bg);color:var(--warn)}
+.badge.bad{background:var(--bad-bg);color:var(--bad)}
+.badges{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:46px;padding:0 18px;border-radius:12px;font-weight:700;background:var(--accent);color:var(--accent-ink)}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn.danger{background:transparent;color:var(--bad);border:1px solid var(--line)}
+.btn.block{display:flex;width:100%}
+.row{display:flex;gap:8px;align-items:center}
+.row.wrap{flex-wrap:wrap}
+.grow{flex:1;min-width:0}
+.back{color:var(--accent);font-weight:700;min-height:40px}
+.chips{display:flex;gap:6px;overflow-x:auto;padding:2px 0 8px;scrollbar-width:none}
+.chip{flex:none;padding:7px 12px;border-radius:99px;border:1px solid var(--line);background:var(--card);font-size:.88rem;font-weight:600}
+.chip.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+ul.list{list-style:none;margin:0;padding:0;background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.item{display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid var(--line)}
+.item:last-child{border-bottom:0}
+.chk{width:30px;height:30px;border-radius:9px;border:2px solid var(--muted);flex:none;font-weight:900;color:var(--accent-ink);display:grid;place-items:center}
+.chk.on{background:var(--ok);border-color:var(--ok);color:#fff}
+.ibody{flex:1;min-width:0;text-align:left;padding:6px 0;display:block}
+.iname{display:block;font-weight:600;overflow-wrap:anywhere}
+.item.missing .iname{color:var(--muted)}
+.imeta{display:block;font-size:.82rem;color:var(--muted)}
+.empty{text-align:center;color:var(--muted);padding:28px 12px}
+.fab{position:fixed;right:max(16px,calc(50% - 244px));bottom:calc(84px + env(safe-area-inset-bottom));box-shadow:0 6px 18px rgba(0,0,0,.25);border-radius:99px;z-index:5}
+#tabs{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);display:flex;justify-content:center;padding-bottom:env(safe-area-inset-bottom);z-index:6}
+#tabs .in{display:flex;width:100%;max-width:520px}
+a{color:var(--accent);font-weight:700}
+.actions.sticky,#onb .actions{position:sticky;bottom:0;background:var(--card);padding:12px 0;margin-bottom:-12px}
+#onb .actions{background:var(--bg)}
+#tabs button{flex:1;min-width:0;padding:8px 0 9px;font-size:.68rem;font-weight:600;color:var(--muted);position:relative}
+#tabs button span{display:block;font-size:1.3rem;line-height:1.3;filter:grayscale(1);opacity:.7}
+#tabs button.on{color:var(--accent)}
+#tabs button.on span{filter:none;opacity:1}
+#tabs .dot{position:absolute;top:4px;left:calc(50% + 6px);background:var(--bad);color:#fff;border-radius:99px;font-size:.65rem;min-width:17px;height:17px;line-height:17px;padding:0 4px}
+.banner{background:var(--soft);border-radius:14px;padding:12px 14px;margin-bottom:12px;font-size:.92rem}
+.banner b{display:block}
+label.f{display:block;font-size:.85rem;font-weight:600;color:var(--muted);margin:12px 0 4px}
+input[type=text],input[type=number],input[type=date],input[type=search],select,textarea{width:100%;min-height:46px;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+textarea{min-height:70px;resize:vertical}
+.check{display:flex;gap:10px;align-items:center;padding:10px 0;font-weight:600}
+.check input{width:22px;height:22px;accent-color:var(--accent);flex:none}
+dialog{border:0;padding:0;background:var(--card);color:var(--ink);width:100%;max-width:520px;margin:auto auto 0;border-radius:22px 22px 0 0;max-height:92vh}
+dialog::backdrop{background:rgba(0,0,0,.5)}
+.sheet{padding:18px 16px calc(18px + env(safe-area-inset-bottom));overflow:auto;max-height:92vh}
+.sheet h3{margin:0 0 4px;font-size:1.2rem}
+.actions{display:flex;gap:8px;margin-top:18px}
+.actions .btn{flex:1}
+.emo{display:flex;gap:6px;flex-wrap:wrap}
+.emo label{font-size:1.5rem;width:46px;height:46px;border-radius:12px;border:2px solid var(--line);display:grid;place-items:center;cursor:pointer}
+.emo input{position:absolute;opacity:0;pointer-events:none}
+.emo input:checked+label{border-color:var(--accent);background:var(--soft)}
+details{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:8px;padding:0 14px}
+summary{padding:13px 0;font-weight:700;cursor:pointer}
+details ul{margin:0 0 12px;padding-left:20px}
+details p{color:var(--muted);font-size:.92rem}
+#onb{position:fixed;inset:0;background:var(--bg);z-index:20;overflow:auto;display:none}
+#onb .in{max-width:520px;margin:0 auto;padding:28px 20px 28px;min-height:100%;display:flex;flex-direction:column}
+#onb .hero{font-size:3.4rem;margin:12px 0}
+#onb .body{flex:1}
+.steps{display:flex;gap:6px;margin-bottom:8px}
+.steps i{height:4px;flex:1;border-radius:2px;background:var(--line)}
+.steps i.on{background:var(--accent)}
+.kit{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:14px 0}
+.kit div{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px;font-size:.9rem;font-weight:600}
+#toast{position:fixed;left:50%;bottom:calc(150px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-size:.9rem;z-index:40;opacity:0;pointer-events:none;transition:opacity .2s;max-width:90vw;text-align:center}
+#toast.on{opacity:1}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+</style>
+</head>
+<body>
+<main id="app"></main>
+<nav id="tabs"><div class="in"></div></nav>
+<dialog id="sheet"><div class="sheet"></div></dialog>
+<div id="onb"><div class="in"></div></div>
+<div id="toast" role="status"></div>
+<input type="file" id="file" accept=".json,.txt,application/json,text/plain" hidden>
+
+<script>
+'use strict';
+const KEY='zainopronto.v1';
+const CATS=[
+ {id:'acqua',n:'Acqua',e:'💧',tip:'Calcola almeno 2 litri a persona al giorno da bere, per 3 giorni. Le pastiglie potabilizzanti pesano poco e allungano l\'autonomia.'},
+ {id:'cibo',n:'Cibo',e:'🥫',tip:'Scegli cibi a lunga conservazione, pronti da mangiare senza cottura e che la tua famiglia mangia davvero. Controlla le scadenze due volte l\'anno.'},
+ {id:'medico',n:'Primo soccorso e farmaci',e:'🩹',tip:'Oltre al kit base, tieni una scorta dei farmaci che prendi abitualmente e una copia delle ricette.'},
+ {id:'igiene',n:'Igiene',e:'🧼',tip:'Formati da viaggio: occupano poco e bastano per qualche giorno.'},
+ {id:'luce',n:'Luce ed energia',e:'🔦',tip:'Una torcia frontale lascia le mani libere. Tieni le batterie fuori dalla torcia per evitare che si scarichino o perdano.'},
+ {id:'comunicazione',n:'Comunicazione',e:'📻',tip:'Se la rete cade, la radio è l\'unico modo per ricevere gli avvisi. Scrivi i numeri importanti su carta.'},
+ {id:'documenti',n:'Documenti e denaro',e:'📄',tip:'Fotocopie in una busta impermeabile: documenti d\'identità, tessera sanitaria, polizze. Contanti in piccolo taglio.'},
+ {id:'vestiti',n:'Abbigliamento e riparo',e:'🧥',tip:'Adatta il cambio alla stagione e ricordati di aggiornarlo quando cambia il clima.'},
+ {id:'attrezzi',n:'Attrezzi',e:'🛠️',tip:'Pochi oggetti versatili valgono più di tanti specifici.'},
+ {id:'altro',n:'Altro',e:'📦',tip:'Pensa a chi vive con te: bambini, anziani, animali domestici hanno bisogni particolari.'}
+];
+// [nome, categoria, quantità, per persona?]
+const TEMPLATE=[
+ ['Acqua in bottiglia (1,5 L)','acqua',4,1],['Pastiglie potabilizzanti','acqua',1,0],
+ ['Barrette energetiche','cibo',6,1],['Scatolette (tonno, legumi)','cibo',3,1],['Cracker o gallette','cibo',2,1],['Frutta secca','cibo',1,1],
+ ['Kit di primo soccorso','medico',1,0],['Farmaci personali','medico',1,0],['Mascherine FFP2','medico',2,1],['Coperta termica','medico',1,1],
+ ['Salviette umidificate','igiene',1,0],['Gel disinfettante','igiene',1,0],['Carta igienica','igiene',1,0],['Spazzolino e dentifricio','igiene',1,1],
+ ['Torcia frontale','luce',1,0],['Batterie di ricambio','luce',1,0],['Power bank carico','luce',1,0],['Cavo di ricarica','luce',1,0],
+ ['Radio a pile o a manovella','comunicazione',1,0],['Fischietto','comunicazione',1,0],['Lista contatti su carta','comunicazione',1,0],
+ ['Copie dei documenti','documenti',1,0],['Contanti in piccolo taglio','documenti',1,0],['Chiavi di riserva','documenti',1,0],
+ ['Cambio completo di vestiti','vestiti',1,1],['Poncho impermeabile','vestiti',1,1],['Scarpe robuste','vestiti',1,1],['Coperta o sacco a pelo','vestiti',1,1],
+ ['Coltellino multiuso','attrezzi',1,0],['Accendino e fiammiferi','attrezzi',1,0],['Nastro americano','attrezzi',1,0],['Sacchetti resistenti','attrezzi',1,0],['Corda (10 m)','attrezzi',1,0]
+];
+const TH=[[60,'2 mesi prima'],[30,'1 mese prima'],[7,'1 settimana prima']];
+const ICONS=['🎒','🏠','🚗','🏢','👨‍👩‍👧','🐾'];
+
+const $=s=>document.querySelector(s);
+const app=$('#app'),sheetEl=$('#sheet'),sheetIn=$('#sheet .sheet'),onbEl=$('#onb');
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+const cat=id=>CATS.find(c=>c.id===id)||CATS[CATS.length-1];
+const pad=n=>String(n).padStart(2,'0');
+const todayStr=()=>{const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())};
+const parseD=s=>{const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)};
+const daysTo=s=>Math.round((parseD(s)-parseD(todayStr()))/864e5);
+const fmtD=s=>{const [y,m,d]=s.split('-');return d+'/'+m+'/'+y};
+
+function blank(){return{v:1,bags:[],items:[],notified:{},notes:{meet:'',contacts:'',other:''},settings:{thresholds:[60,30],notif:false,onboarded:false,lastBackup:null,reviewMonths:6}}}
+function load(){try{const r=JSON.parse(localStorage.getItem(KEY));if(r&&Array.isArray(r.bags)&&Array.isArray(r.items)){const b=blank();return{...b,...r,settings:{...b.settings,...r.settings},notes:{...b.notes,...r.notes}}}}catch(e){}return blank()}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){toast('Impossibile salvare i dati su questo dispositivo')}syncNative()}
+// Nell'app Android: passa le scadenze alla parte nativa, che avvisa anche ad app chiusa.
+const NB=window.AndroidBridge||null;
+let pendingSave=null;
+function syncNative(){if(!NB)return;try{NB.sync(JSON.stringify({notif:db.settings.notif,thresholds:db.settings.thresholds,items:db.items.filter(i=>i.expiry).map(i=>({id:i.id,name:i.name,expiry:i.expiry}))}))}catch(e){}}
+window.onNotifPermission=ok=>{db.settings.notif=!!ok;save();if(!ok)toast('Permesso negato: abilitalo nelle impostazioni del telefono');if(onbEl.style.display==='block')renderOnb();else render()};
+window.onFileSaved=ok=>{const f=pendingSave;pendingSave=null;if(!ok)return;if(f)f();else toast('File salvato')};
+window.onNativeBack=()=>{
+  if(sheetEl.open){A.close();return true}
+  if(onbEl.style.display==='block'){if(ui.onb>0){A['onb-back']();return true}return false}
+  if(ui.tab==='bags'&&ui.bagId){A.back();return true}
+  if(ui.tab!=='bags'){A.tab('bags');return true}
+  return false;
+};
+let db=load();
+const ui={tab:'bags',bagId:null,filter:'all',q:'',qcat:'all',onb:0,newBag:null,intro:false,asked:false};
+let pending=null;
+
+const maxTh=()=>db.settings.thresholds.length?Math.max(...db.settings.thresholds):60;
+function expState(it){
+  if(!it.expiry)return null;
+  const d=daysTo(it.expiry);
+  if(d<0)return{cls:'bad',label:'Scaduto',d};
+  if(d===0)return{cls:'bad',label:'Scade oggi',d};
+  if(d<=30)return{cls:'bad',label:'tra '+d+' g',d};
+  if(d<=maxTh())return{cls:'warn',label:'tra '+d+' g',d};
+  return{cls:'ok',label:it.expiry.slice(5,7)+'/'+it.expiry.slice(0,4),d};
+}
+function bagStats(b){
+  const its=db.items.filter(i=>i.bagId===b.id);let exp=0,soon=0;const m=maxTh();
+  its.forEach(i=>{if(!i.expiry)return;const d=daysTo(i.expiry);if(d<0)exp++;else if(d<=m)soon++});
+  return{n:its.length,have:its.filter(i=>i.have).length,exp,soon};
+}
+function reviewDue(b){
+  if(!b.lastReview)return false;
+  const d=parseD(b.lastReview);d.setMonth(d.getMonth()+db.settings.reviewMonths);
+  return d<=new Date();
+}
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('on'),2600)}
+
+/* ---------- viste ---------- */
+function itemRow(it,showBag){
+  const s=expState(it),c=cat(it.cat);
+  const bag=showBag?db.bags.find(b=>b.id===it.bagId):null;
+  const meta=[it.qty>1?'×'+it.qty:'',bag?bag.icon+' '+esc(bag.name):'',showBag?c.n:'',it.expiry?'scad. '+fmtD(it.expiry):''].filter(Boolean).join(' · ');
+  return `<li class="item ${it.have?'':'missing'}">
+    <button class="chk ${it.have?'on':''}" data-act="toggle" data-id="${it.id}" aria-pressed="${it.have}" aria-label="${it.have?'Nello zaino':'Mancante'}: ${esc(it.name)}">${it.have?'✓':''}</button>
+    <button class="ibody" data-act="edit-item" data-id="${it.id}"><span class="iname">${esc(it.name)}</span>${meta?`<span class="imeta">${meta}</span>`:''}</button>
+    ${s?`<span class="badge ${s.cls}">${s.label}</span>`:''}</li>`;
+}
+function viewBags(){
+  let h=`<h1>I miei zaini</h1><p class="sub">Tieni pronto l'essenziale per 72 ore.</p>`;
+  const lb=db.settings.lastBackup;
+  if(db.items.length&&(!lb||daysTo(lb.slice(0,10))<-30))
+    h+=`<div class="banner"><b>${lb?'Backup vecchio di oltre un mese':'Nessun backup ancora'}</b>Salva una copia dei tuoi dati per non perderli. <button class="back" data-act="tab" data-id="settings">Vai al backup →</button></div>`;
+  if(!db.bags.length)h+=`<div class="card empty">Non hai ancora nessuno zaino.<br>Creane uno per iniziare.</div>`;
+  db.bags.forEach(b=>{
+    const s=bagStats(b),pct=s.n?Math.round(s.have/s.n*100):0;
+    h+=`<button class="card bag" data-act="open-bag" data-id="${b.id}"><span class="ico">${b.icon}</span><span class="info">
+      <span class="name">${esc(b.name)}</span>
+      <span class="bar"><i style="width:${pct}%"></i></span>
+      <span class="small">${s.have} di ${s.n} articoli pronti · ${b.persons} ${b.persons==1?'persona':'persone'}</span>
+      <span class="badges">${s.exp?`<span class="badge bad">${s.exp} scadut${s.exp==1?'o':'i'}</span>`:''}${s.soon?`<span class="badge warn">${s.soon} in scadenza</span>`:''}${reviewDue(b)?`<span class="badge warn">Da ricontrollare</span>`:''}</span>
+    </span></button>`;
+  });
+  return h+`<button class="btn block" data-act="new-bag">+ Nuovo zaino</button>`;
+}
+function viewBag(){
+  const b=db.bags.find(x=>x.id===ui.bagId);
+  if(!b){ui.bagId=null;return viewBags()}
+  const s=bagStats(b);
+  let its=db.items.filter(i=>i.bagId===b.id);
+  if(ui.filter==='missing')its=its.filter(i=>!i.have);
+  if(ui.filter==='exp')its=its.filter(i=>i.expiry&&daysTo(i.expiry)<=maxTh());
+  let h=`<div class="row"><button class="back grow" style="text-align:left" data-act="back">← Zaini</button><button class="back" data-act="edit-bag" data-id="${b.id}">Modifica</button></div>
+  <h1>${b.icon} ${esc(b.name)}</h1><p class="sub">${s.have} di ${s.n} articoli pronti${b.lastReview?' · controllato il '+fmtD(b.lastReview):''}</p>`;
+  if(reviewDue(b))h+=`<div class="banner"><b>È ora di ricontrollare lo zaino</b>Sono passati più di ${db.settings.reviewMonths} mesi dall'ultimo controllo. <button class="back" data-act="review" data-id="${b.id}">Segna come controllato</button></div>`;
+  h+=`<div class="chips">${[['all','Tutti'],['missing','Mancanti ('+(s.n-s.have)+')'],['exp','In scadenza ('+(s.exp+s.soon)+')']].map(([k,l])=>`<button class="chip ${ui.filter===k?'on':''}" data-act="filter" data-id="${k}">${l}</button>`).join('')}</div>`;
+  if(!its.length)h+=`<div class="card empty">${s.n?'Nessun articolo con questo filtro.':'Zaino vuoto. Aggiungi il primo articolo.'}</div>`;
+  CATS.forEach(c=>{
+    const g=its.filter(i=>cat(i.cat).id===c.id);if(!g.length)return;
+    g.sort((a,x)=>a.name.localeCompare(x.name,'it'));
+    h+=`<h2>${c.e} ${c.n}</h2><ul class="list">${g.map(i=>itemRow(i)).join('')}</ul>`;
+  });
+  return h+`<button class="btn fab" data-act="new-item">+ Articolo</button>`;
+}
+function searchResults(){
+  const q=ui.q.trim().toLowerCase();
+  let its=db.items.filter(i=>(ui.qcat==='all'||cat(i.cat).id===ui.qcat)&&(!q||i.name.toLowerCase().includes(q)||(i.notes||'').toLowerCase().includes(q)));
+  if(!q&&ui.qcat==='all')return`<div class="empty">Scrivi il nome di un articolo o scegli una categoria.</div>`;
+  if(!its.length)return`<div class="card empty">Nessun articolo trovato.</div>`;
+  its.sort((a,b)=>a.name.localeCompare(b.name,'it'));
+  return`<p class="small">${its.length} risultat${its.length==1?'o':'i'}</p><ul class="list">${its.map(i=>itemRow(i,true)).join('')}</ul>`;
+}
+function viewSearch(){
+  return`<h1>Cerca</h1><p class="sub">Trova un articolo in tutti gli zaini.</p>
+  <input type="search" id="q" placeholder="Es. torcia, tonno, batterie…" value="${esc(ui.q)}" aria-label="Cerca articolo" autocomplete="off">
+  <div class="chips" style="margin-top:10px"><button class="chip ${ui.qcat==='all'?'on':''}" data-act="qcat" data-id="all">Tutte</button>${CATS.map(c=>`<button class="chip ${ui.qcat===c.id?'on':''}" data-act="qcat" data-id="${c.id}">${c.e} ${c.n}</button>`).join('')}</div>
+  <div id="results">${searchResults()}</div>`;
+}
+function viewExpiry(){
+  const its=db.items.filter(i=>i.expiry).sort((a,b)=>a.expiry.localeCompare(b.expiry));
+  let h=`<h1>Scadenze</h1><p class="sub">Tutti gli articoli con una data di scadenza.</p>`;
+  if(!its.length)return h+`<div class="card empty">Nessuna scadenza registrata.<br>Aggiungi la data quando inserisci cibo, acqua, farmaci o batterie.</div>`;
+  const m=maxTh();
+  [['Scaduti',d=>d<0],['Entro 30 giorni',d=>d>=0&&d<=30],['Entro '+m+' giorni',d=>d>30&&d<=m],['Più avanti',d=>d>Math.max(30,m)]].forEach(([t,f])=>{
+    const g=its.filter(i=>f(daysTo(i.expiry)));
+    if(g.length)h+=`<h2>${t}</h2><ul class="list">${g.map(i=>itemRow(i,true)).join('')}</ul>`;
+  });
+  return h+`<h2>Promemoria sul calendario</h2><div class="card"><p class="small">Esporta le scadenze in un file da aprire con Google Calendar o un altro calendario: riceverai gli avvisi anche se non apri l'app.</p><button class="btn ghost block" data-act="ics">Esporta nel calendario</button></div>`;
+}
+function viewGuide(){
+  return`<h1>Guida</h1><p class="sub">Cosa mettere in uno zaino di emergenza.</p>
+  <div class="banner"><b>La regola delle 72 ore</b>Lo zaino serve a restare autonomi per circa tre giorni se devi lasciare casa in fretta o se mancano acqua, luce e negozi. Tienilo vicino all'uscita, in un punto che tutti in casa conoscono.</div>
+  ${CATS.map(c=>{const l=TEMPLATE.filter(t=>t[1]===c.id);return`<details><summary>${c.e} ${c.n}</summary><p>${c.tip}</p>${l.length?`<ul>${l.map(t=>`<li>${t[0]}</li>`).join('')}</ul>`:''}</details>`}).join('')}
+  <h2>Buone abitudini</h2><div class="card small" style="color:var(--ink)">
+  <p>• Ricontrolla lo zaino ogni 6 mesi: scadenze, batterie, taglie dei vestiti.</p>
+  <p>• Non superare un peso che riesci a portare a lungo (circa il 15–20% del tuo peso).</p>
+  <p>• Prepara uno zaino per persona, oppure uno a casa e uno in auto.</p>
+  <p style="margin:0">• In emergenza chiama il <b>112</b>, numero unico europeo.</p></div>
+  <h2>Informazioni</h2><div class="card small" style="color:var(--ink)"><p><b>Zaino Pronto</b> · versione 1.1</p>
+  <p style="margin:0">Per segnalare un bug scrivi su Telegram a <a href="https://t.me/gionatan1997" target="_blank" rel="noopener">@gionatan1997</a>.</p></div>`;
+}
+function viewSettings(){
+  const s=db.settings,canShare=!!navigator.share&&!!navigator.canShare;
+  return`<h1>Opzioni</h1>
+  <h2>Notifiche di scadenza</h2><div class="card">
+   <label class="check"><input type="checkbox" data-ch="notif" ${s.notif?'checked':''}> Attiva le notifiche</label>
+   <p class="small">Avvisami:</p>
+   ${TH.map(([d,l])=>`<label class="check"><input type="checkbox" data-ch="th" value="${d}" ${s.thresholds.includes(d)?'checked':''}> ${l}</label>`).join('')}
+   <label class="f" for="rev">Ricordami di ricontrollare lo zaino ogni</label>
+   <select id="rev" data-ch="rev">${[3,6,12].map(m=>`<option value="${m}" ${s.reviewMonths==m?'selected':''}>${m} mesi</option>`).join('')}</select>
+  </div>
+  <h2>Backup</h2><div class="card">
+   <p class="small">${s.lastBackup?'Ultimo backup: '+fmtD(s.lastBackup.slice(0,10)):'Non hai ancora fatto un backup.'} Il file contiene tutti gli zaini e le impostazioni.</p>
+   ${canShare?`<button class="btn block" data-act="backup-share">Salva su Google Drive / condividi</button><div style="height:8px"></div>`:''}
+   <button class="btn ${canShare?'ghost':''} block" data-act="backup-dl">${NB?'Salva backup (telefono o Google Drive)':'Scarica il file di backup'}</button><div style="height:8px"></div>
+   <button class="btn ghost block" data-act="restore">Ripristina da un backup</button>
+  </div>
+  <h2>Altro</h2><div class="card">
+   <button class="btn ghost block" data-act="intro">Rivedi l'introduzione</button><div style="height:8px"></div>
+   <button class="btn danger block" data-act="wipe">Cancella tutti i dati</button>
+  </div>`;
+}
+function viewNotes(){
+  const f=(k,l,ph)=>`<label class="f" for="n_${k}">${l}</label><textarea id="n_${k}" data-note="${k}" style="min-height:104px" maxlength="2000" placeholder="${ph}">${esc(db.notes[k])}</textarea>`;
+  return`<h1>Note</h1><p class="sub">Informazioni da avere sotto mano in emergenza. Si salvano da sole.</p>
+  <div class="card">${f('meet','📍 Punto di ritrovo','Es. parcheggio della scuola di via Roma. Se non è raggiungibile: casa dei nonni.')}
+  ${f('contacts','📞 Contatti di emergenza','Es. Maria (sorella) 333 1234567&#10;Medico di base 02 123456')}
+  ${f('other','📝 Altre note','Es. allergie, farmaci da prendere, dove sono le chiavi di riserva.')}</div>
+  <p class="small" style="margin-top:12px">Numero unico di emergenza: <b>112</b></p>`;
+}
+const TABS=[['bags','🎒','Zaini'],['search','🔍','Cerca'],['expiry','⏰','Scadenze'],['notes','📝','Note'],['guide','📖','Guida'],['settings','⚙️','Opzioni']];
+function render(){
+  app.innerHTML={bags:()=>ui.bagId?viewBag():viewBags(),search:viewSearch,expiry:viewExpiry,notes:viewNotes,guide:viewGuide,settings:viewSettings}[ui.tab]();
+  const n=db.items.filter(i=>i.expiry&&daysTo(i.expiry)<=maxTh()).length;
+  $('#tabs .in').innerHTML=TABS.map(([k,e,l])=>`<button class="${ui.tab===k?'on':''}" data-act="tab" data-id="${k}"><span>${e}</span>${l}${k==='expiry'&&n?`<b class="dot">${n}</b>`:''}</button>`).join('');
+}
+
+/* ---------- pannelli ---------- */
+function openSheet(html){sheetIn.innerHTML=html;if(!sheetEl.open)sheetEl.showModal();sheetIn.scrollTop=0}
+function closeSheet(){if(sheetEl.open)sheetEl.close()}
+function confirmSheet(title,msg,label,cb){pending=cb;openSheet(`<h3>${title}</h3><p class="small">${msg}</p><div class="actions"><button class="btn ghost" data-act="close">Annulla</button><button class="btn" data-act="confirm">${label}</button></div>`)}
+function bagForm(b){
+  const n=!b;b=b||{name:'',icon:'🎒',persons:1};
+  openSheet(`<form data-form="bag" data-id="${b.id||''}"><h3>${n?'Nuovo zaino':'Modifica zaino'}</h3>
+  <label class="f" for="bn">Nome</label><input type="text" id="bn" name="name" required maxlength="40" placeholder="Es. Zaino di casa" value="${esc(b.name)}">
+  <label class="f">Icona</label><div class="emo">${ICONS.map((e,i)=>`<input type="radio" name="icon" id="ic${i}" value="${e}" ${b.icon===e?'checked':''}><label for="ic${i}">${e}</label>`).join('')}</div>
+  <label class="f" for="bp">Per quante persone</label><input type="number" id="bp" name="persons" min="1" max="12" inputmode="numeric" value="${b.persons}">
+  <div class="actions"><button type="button" class="btn ghost" data-act="close">Annulla</button><button class="btn">${n?'Avanti':'Salva'}</button></div>
+  ${n?'':`<div class="actions"><button type="button" class="btn ghost" data-act="review" data-id="${b.id}">Controllato oggi</button><button type="button" class="btn ghost" data-act="dup-bag" data-id="${b.id}">Duplica</button></div><div class="actions"><button type="button" class="btn danger" data-act="del-bag" data-id="${b.id}">Elimina zaino</button></div>`}
+  </form>`);
+}
+function itemForm(it){
+  const n=!it;it=it||{name:'',cat:'cibo',qty:1,expiry:'',notes:'',have:true,bagId:ui.bagId||(db.bags[0]||{}).id};
+  openSheet(`<form data-form="item" data-id="${it.id||''}"><h3>${n?'Nuovo articolo':'Modifica articolo'}</h3>
+  <label class="f" for="in">Nome</label><input type="text" id="in" name="name" required maxlength="60" placeholder="Es. Tonno in scatola" value="${esc(it.name)}">
+  <div class="row"><div class="grow"><label class="f" for="ic">Categoria</label><select id="ic" name="cat">${CATS.map(c=>`<option value="${c.id}" ${cat(it.cat).id===c.id?'selected':''}>${c.e} ${c.n}</option>`).join('')}</select></div>
+  <div style="width:96px"><label class="f" for="iq">Quantità</label><input type="number" id="iq" name="qty" min="1" max="999" inputmode="numeric" value="${it.qty}"></div></div>
+  <label class="f" for="ie">Scadenza (lascia vuoto se non scade)</label><input type="date" id="ie" name="expiry" value="${it.expiry}">
+  ${db.bags.length>1?`<label class="f" for="ib">Zaino</label><select id="ib" name="bagId">${db.bags.map(b=>`<option value="${b.id}" ${b.id===it.bagId?'selected':''}>${b.icon} ${esc(b.name)}</option>`).join('')}</select>`:`<input type="hidden" name="bagId" value="${it.bagId}">`}
+  <label class="f" for="io">Note</label><textarea id="io" name="notes" maxlength="200" placeholder="Es. tasca frontale">${esc(it.notes)}</textarea>
+  <label class="check"><input type="checkbox" name="have" ${it.have?'checked':''}> È già nello zaino</label>
+  <div class="actions"><button type="button" class="btn ghost" data-act="close">Annulla</button><button class="btn">Salva</button></div>
+  ${n?'':`<div class="actions"><button type="button" class="btn danger" data-act="del-item" data-id="${it.id}">Elimina articolo</button></div>`}
+  </form>`);
+}
+// Crea lo zaino con i soli articoli consigliati scelti (idx = posizioni in TEMPLATE).
+function createBag(name,icon,persons,idx){
+  const b={id:uid(),name,icon,persons,lastReview:todayStr()};db.bags.push(b);
+  (idx||[]).forEach(i=>{const t=TEMPLATE[i];if(t)db.items.push({id:uid(),bagId:b.id,name:t[0],cat:t[1],qty:t[3]?t[2]*persons:t[2],expiry:'',notes:'',have:true})});
+  return b;
+}
+function pickerHtml(){
+  return`<p class="small">Seleziona gli articoli che vuoi nel tuo zaino: solo quelli scelti entrano nell'elenco. Potrai aggiungerne altri in qualsiasi momento.</p><button type="button" class="back" data-act="pick-all">Seleziona tutto</button>`+
+  CATS.map(c=>{const l=TEMPLATE.map((t,i)=>[t,i]).filter(x=>x[0][1]===c.id);return l.length?`<h2>${c.e} ${c.n}</h2><p class="small">${c.tip}</p>${l.map(([t,i])=>`<label class="check"><input type="checkbox" name="t" value="${i}"> ${t[0]}</label>`).join('')}`:''}).join('');
+}
+
+/* ---------- introduzione ---------- */
+function renderOnb(){
+  const s=ui.onb,st=db.settings,nb=ui.newBag||{name:'Zaino di casa',persons:2};
+  // Nell'app Android la richiesta di permesso compare subito, al primo avvio.
+  if(s===0&&NB&&!st.notif&&!ui.asked&&!ui.intro){ui.asked=true;NB.requestNotifications()}
+  const steps=`<div class="steps">${(ui.intro?[0,1]:[0,1,2,3]).map(i=>`<i class="${i<=s?'on':''}"></i>`).join('')}</div>`;
+  const body=[
+   `<div class="hero">🔔</div><h1>Attiva gli avvisi di scadenza</h1><p>Zaino Pronto ti avvisa prima che cibo, acqua, farmaci e batterie scadano, così lo zaino resta sempre utilizzabile.</p>
+    ${st.notif?`<div class="banner"><b>✓ Notifiche attive</b>Riceverai gli avvisi con l'anticipo scelto qui sotto.</div>`:`<button class="btn block" data-act="onb-notif">Attiva le notifiche</button>`}
+    <p class="small" style="margin-top:18px">Avvisami:</p>${TH.map(([d,l])=>`<label class="check"><input type="checkbox" data-ch="th" value="${d}" ${st.thresholds.includes(d)?'checked':''}> ${l}</label>`).join('')}<p class="small">Puoi cambiare tutto in seguito dalle Opzioni.</p>${NB?'':`<p class="small">Su iPhone e nel browser gli avvisi compaiono quando apri l'app. Per riceverli anche ad app chiusa, esporta le scadenze nel calendario dalla sezione Scadenze.</p>`}`,
+   `<div class="hero">🎒</div><h1>Benvenuto in Zaino Pronto</h1><p>Uno zaino di emergenza ti permette di uscire di casa in pochi minuti con tutto il necessario per <b>72 ore</b>: terremoti, alluvioni, incendi, blackout prolungati.</p><p>Con questa app tieni l'elenco di cosa c'è dentro, controlli le scadenze e annoti punto di ritrovo e contatti di emergenza.</p>`,
+   `<h1>Crea il tuo primo zaino</h1><form data-form="onb" id="onbf"><label class="f" for="on">Nome</label><input type="text" id="on" name="name" required maxlength="40" value="${esc(nb.name)}">
+    <label class="f" for="op">Per quante persone</label><input type="number" id="op" name="persons" min="1" max="12" inputmode="numeric" value="${nb.persons}"></form><p class="small" style="margin-top:14px">Nel prossimo passo scegli cosa mettere nello zaino.</p>`,
+   `<h1>Cosa mettere nello zaino</h1><form data-form="pick" id="onbf">${pickerHtml()}</form>`
+  ][s];
+  const left=s?`<button class="btn ghost" data-act="onb-back">Indietro</button>`:(st.notif?'':`<button class="btn ghost" data-act="onb-next">Non ora</button>`);
+  const right=s===0?(st.notif?`<button class="btn" data-act="onb-next">Avanti</button>`:''):s===1?`<button class="btn" data-act="onb-next">${ui.intro?'Chiudi':'Avanti'}</button>`:`<button class="btn" form="onbf">${s===2?'Avanti':'Crea zaino'}</button>`;
+  onbEl.querySelector('.in').innerHTML=steps+`<div class="body">${body}</div><div class="actions">${left}${right}</div>`;
+  onbEl.style.display='block';onbEl.scrollTop=0;
+}
+function endOnb(){db.settings.onboarded=true;save();onbEl.style.display='none';render()}
+
+/* ---------- notifiche ---------- */
+async function notify(title,body){
+  if(NB||!db.settings.notif||!('Notification' in window)||Notification.permission!=='granted')return;
+  try{
+    const reg=navigator.serviceWorker&&await navigator.serviceWorker.getRegistration();
+    if(reg)reg.showNotification(title,{body,icon:'icon.svg',tag:'scadenze'});else new Notification(title,{body});
+  }catch(e){}
+}
+function checkExpiry(){
+  const th=[...db.settings.thresholds].sort((a,b)=>a-b),due=[];
+  db.items.forEach(it=>{
+    if(!it.expiry)return;const d=daysTo(it.expiry);
+    const lvl=d<0?'x':th.find(t=>d<=t);if(lvl===undefined)return;
+    const k=it.id+'|'+it.expiry+'|'+lvl;if(db.notified[k])return;
+    db.notified[k]=1;due.push(it);
+  });
+  if(!due.length)return;
+  save();
+  const body=due.slice(0,4).map(i=>i.name+' ('+(daysTo(i.expiry)<0?'scaduto':fmtD(i.expiry))+')').join(', ')+(due.length>4?' e altri '+(due.length-4):'');
+  notify(due.length===1?'1 articolo in scadenza':due.length+' articoli in scadenza',body);
+  if(db.settings.onboarded)toast('⏰ In scadenza: '+body);
+}
+async function setNotif(on,box){
+  if(on&&NB){NB.requestNotifications();return}
+  if(on){
+    if(!('Notification' in window)){toast(/iPhone|iPad/.test(navigator.userAgent)?'Su iPhone aggiungi prima l\'app alla schermata Home':'Questo dispositivo non supporta le notifiche');on=false}
+    else if(await Notification.requestPermission()!=='granted'){toast('Permesso negato: abilitalo nelle impostazioni del telefono');on=false}
+  }
+  db.settings.notif=on;save();if(box)box.checked=on;
+}
+
+/* ---------- backup ed esportazioni ---------- */
+function download(name,text,mime){if(NB){NB.saveFile(name,mime,text);return}const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:mime}));a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),5000)}
+async function share(name,text,mime){
+  // Alcuni telefoni condividono solo file di testo: si riprova come .txt
+  for(const [n,m] of [[name,mime],[name.replace(/\.\w+$/,'.txt'),'text/plain']]){
+    const f=new File([text],n,{type:m});
+    if(navigator.canShare&&navigator.canShare({files:[f]})){
+      try{await navigator.share({files:[f],title:'Zaino Pronto'});return true}catch(e){if(e.name==='AbortError')return false}
+    }
+  }
+  download(name,text,mime);return true;
+}
+function backupData(){return JSON.stringify({app:'zaino-pronto',v:1,exported:new Date().toISOString(),bags:db.bags,items:db.items,notes:db.notes,settings:db.settings},null,1)}
+async function doBackup(viaShare){
+  const name='zaino-pronto-backup-'+todayStr()+'.json',txt=backupData();
+  if(NB){pendingSave=()=>{db.settings.lastBackup=new Date().toISOString();save();render();toast('Backup creato')};NB.saveFile(name,'application/json',txt);return}
+  const ok=viaShare?await share(name,txt,'application/json'):(download(name,txt,'application/json'),true);
+  if(ok){db.settings.lastBackup=new Date().toISOString();save();render();toast('Backup creato')}
+}
+function readBackup(file){
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const d=JSON.parse(r.result);
+      if(!Array.isArray(d.bags)||!Array.isArray(d.items)||!d.bags.every(b=>b.id&&typeof b.name==='string'))throw 0;
+      pending=d;
+      openSheet(`<h3>Ripristina backup</h3><p class="small">Il file contiene ${d.bags.length} zain${d.bags.length==1?'o':'i'} e ${d.items.length} articoli${d.exported?', salvati il '+fmtD(d.exported.slice(0,10)):''}.</p>
+      <button class="btn block" data-act="imp-merge">Aggiungi ai dati attuali</button><div style="height:8px"></div>
+      <button class="btn danger block" data-act="imp-replace">Sostituisci tutto</button><div style="height:8px"></div>
+      <button class="btn ghost block" data-act="close">Annulla</button>`);
+    }catch(e){toast('File non valido: non è un backup di Zaino Pronto')}
+  };
+  r.readAsText(file);
+}
+function cleanImport(d){
+  const bags=d.bags.map(b=>({id:String(b.id),name:String(b.name).slice(0,40),icon:ICONS.includes(b.icon)?b.icon:'🎒',persons:Math.min(12,Math.max(1,parseInt(b.persons)||1)),lastReview:/^\d{4}-\d\d-\d\d$/.test(b.lastReview)?b.lastReview:todayStr()}));
+  const ids=new Set(bags.map(b=>b.id));
+  const items=d.items.filter(i=>i&&ids.has(String(i.bagId))&&i.name).map(i=>({id:String(i.id||uid()),bagId:String(i.bagId),name:String(i.name).slice(0,60),cat:cat(i.cat).id,qty:Math.min(999,Math.max(1,parseInt(i.qty)||1)),expiry:/^\d{4}-\d\d-\d\d$/.test(i.expiry)?i.expiry:'',notes:String(i.notes||'').slice(0,200),have:!!i.have}));
+  const n=d.notes||{},s=k=>String(n[k]||'').slice(0,2000);
+  return{bags,items,notes:{meet:s('meet'),contacts:s('contacts'),other:s('other')}};
+}
+function exportICS(){
+  const its=db.items.filter(i=>i.expiry);
+  if(!its.length)return toast('Nessuna scadenza da esportare');
+  const e=s=>String(s).replace(/([\\;,])/g,'\\$1').replace(/\n/g,' ');
+  const stamp=new Date().toISOString().replace(/[-:]|\.\d+/g,'');
+  const L=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Zaino Pronto//IT'];
+  its.forEach(i=>{
+    const b=db.bags.find(x=>x.id===i.bagId),t=e('Scade: '+i.name+(b?' ('+b.name+')':''));
+    L.push('BEGIN:VEVENT','UID:'+i.id+'@zainopronto','DTSTAMP:'+stamp,'DTSTART;VALUE=DATE:'+i.expiry.replace(/-/g,''),'SUMMARY:'+t);
+    db.settings.thresholds.forEach(d=>L.push('BEGIN:VALARM','ACTION:DISPLAY','DESCRIPTION:'+t,'TRIGGER:-P'+d+'D','END:VALARM'));
+    L.push('END:VEVENT');
+  });
+  L.push('END:VCALENDAR');
+  const txt=L.join('\r\n');
+  if(navigator.canShare)share('scadenze-zaino.ics',txt,'text/calendar');else download('scadenze-zaino.ics',txt,'text/calendar');
+}
+
+/* ---------- azioni ---------- */
+const A={
+  tab(id){ui.tab=id;if(id==='bags')ui.bagId=null;render();scrollTo(0,0)},
+  'open-bag'(id){ui.bagId=id;ui.filter='all';render();scrollTo(0,0)},
+  back(){ui.bagId=null;render()},
+  filter(id){ui.filter=id;render()},
+  qcat(id){ui.qcat=id;render()},
+  close(){pending=null;closeSheet()},
+  confirm(){const f=pending;pending=null;closeSheet();if(typeof f==='function')f()},
+  'new-bag'(){bagForm()},
+  'edit-bag'(id){bagForm(db.bags.find(b=>b.id===id))},
+  'dup-bag'(id){
+    const b=db.bags.find(x=>x.id===id);if(!b)return;
+    const nb={...b,id:uid(),name:(b.name+' (copia)').slice(0,40)};db.bags.push(nb);
+    db.items.filter(i=>i.bagId===id).forEach(i=>db.items.push({...i,id:uid(),bagId:nb.id}));
+    save();closeSheet();ui.bagId=nb.id;render();toast('Zaino duplicato');
+  },
+  'del-bag'(id){
+    const b=db.bags.find(x=>x.id===id);if(!b)return;
+    confirmSheet('Eliminare lo zaino?','«'+esc(b.name)+'» e tutti i suoi articoli verranno eliminati. Non si può annullare.','Elimina',()=>{
+      db.bags=db.bags.filter(x=>x.id!==id);db.items=db.items.filter(i=>i.bagId!==id);save();ui.bagId=null;render();
+    });
+  },
+  review(id){const b=db.bags.find(x=>x.id===id);if(!b)return;b.lastReview=todayStr();save();closeSheet();render();toast('Controllo registrato')},
+  'new-item'(){itemForm()},
+  'edit-item'(id){itemForm(db.items.find(i=>i.id===id))},
+  toggle(id){const i=db.items.find(x=>x.id===id);if(!i)return;i.have=!i.have;save();render()},
+  'del-item'(id){db.items=db.items.filter(i=>i.id!==id);save();closeSheet();render();toast('Articolo eliminato')},
+  'backup-share'(){doBackup(true)},
+  'backup-dl'(){doBackup(false)},
+  restore(){$('#file').value='';$('#file').click()},
+  'imp-replace'(){const d=cleanImport(pending);pending=null;db.bags=d.bags;db.items=d.items;db.notes=d.notes;db.notified={};save();closeSheet();ui.bagId=null;ui.tab='bags';render();toast('Backup ripristinato')},
+  'imp-merge'(){
+    const d=cleanImport(pending);pending=null;const map={};
+    d.bags.forEach(b=>{const id=uid();map[b.id]=id;db.bags.push({...b,id})});
+    d.items.forEach(i=>db.items.push({...i,id:uid(),bagId:map[i.bagId]}));
+    Object.keys(d.notes).forEach(k=>{if(!db.notes[k])db.notes[k]=d.notes[k]});
+    save();closeSheet();ui.bagId=null;ui.tab='bags';render();toast('Zaini aggiunti');
+  },
+  ics(){exportICS()},
+  intro(){ui.onb=0;ui.intro=true;renderOnb()},
+  async 'onb-notif'(){await setNotif(true);if(!NB)renderOnb()},
+  'pick-all'(id,t){const b=[...t.closest('form').querySelectorAll('[name=t]')],on=b.some(x=>!x.checked);b.forEach(x=>x.checked=on)},
+  wipe(){confirmSheet('Cancellare tutti i dati?','Zaini, articoli e impostazioni verranno eliminati da questo dispositivo. Fai prima un backup se vuoi conservarli.','Cancella tutto',()=>{db=blank();save();ui.bagId=null;ui.tab='bags';ui.onb=0;ui.intro=false;ui.asked=false;ui.newBag=null;render();renderOnb()})},
+  'onb-next'(){if(ui.intro&&ui.onb===1){ui.intro=false;onbEl.style.display='none';render();return}ui.onb++;renderOnb()},
+  'onb-back'(){ui.onb--;renderOnb()},
+  'onb-skip'(){endOnb()}
+};
+document.addEventListener('click',e=>{
+  if(e.target===sheetEl){A.close();return}
+  const t=e.target.closest('[data-act]');if(!t)return;
+  const f=A[t.dataset.act];if(f)f(t.dataset.id,t);
+});
+sheetEl.addEventListener('cancel',()=>{pending=null});
+document.addEventListener('submit',e=>{
+  e.preventDefault();
+  const form=e.target,f=new FormData(form),kind=form.dataset.form,id=form.dataset.id;
+  if(kind==='pick'){
+    const n=ui.newBag;if(!n)return;
+    const b=createBag(n.name,n.icon,n.persons,f.getAll('t').map(Number));
+    ui.newBag=null;ui.tab='bags';ui.bagId=b.id;ui.filter='all';save();closeSheet();
+    if(onbEl.style.display==='block')endOnb();else render();
+    scrollTo(0,0);return;
+  }
+  const name=String(f.get('name')||'').trim();if(!name)return;
+  const persons=Math.min(12,Math.max(1,parseInt(f.get('persons'))||1));
+  if(kind==='bag'){
+    if(id){const b=db.bags.find(x=>x.id===id);Object.assign(b,{name,icon:f.get('icon')||'🎒',persons})}
+    else{
+      ui.newBag={name,icon:f.get('icon')||'🎒',persons};
+      openSheet(`<form data-form="pick"><h3>Cosa mettere nello zaino</h3>${pickerHtml()}<div class="actions sticky"><button type="button" class="btn ghost" data-act="close">Annulla</button><button class="btn">Crea zaino</button></div></form>`);
+      return;
+    }
+    save();closeSheet();render();
+  }else if(kind==='item'){
+    const d={name,cat:f.get('cat'),qty:Math.min(999,Math.max(1,parseInt(f.get('qty'))||1)),expiry:f.get('expiry')||'',notes:String(f.get('notes')||'').trim(),have:f.get('have')==='on',bagId:f.get('bagId')};
+    if(id)Object.assign(db.items.find(i=>i.id===id),d);else db.items.push({id:uid(),...d});
+    save();closeSheet();render();checkExpiry();
+  }else if(kind==='onb'){
+    ui.newBag={name,icon:'🎒',persons};ui.onb=3;renderOnb();
+  }
+});
+document.addEventListener('change',e=>{
+  const t=e.target;
+  if(t.id==='file'){if(t.files[0])readBackup(t.files[0]);return}
+  const ch=t.dataset.ch;if(!ch)return;
+  if(ch==='notif')setNotif(t.checked,t);
+  if(ch==='th'){const v=+t.value,s=new Set(db.settings.thresholds);t.checked?s.add(v):s.delete(v);db.settings.thresholds=[...s].sort((a,b)=>b-a);save();if(onbEl.style.display!=='block')render()}
+  if(ch==='rev'){db.settings.reviewMonths=+t.value;save()}
+});
+document.addEventListener('input',e=>{const k=e.target.dataset.note;if(k){db.notes[k]=e.target.value;save();return}if(e.target.id==='q'){ui.q=e.target.value;$('#results').innerHTML=searchResults()}});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden){checkExpiry();render()}});
+
+if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
+render();
+if(!db.settings.onboarded)renderOnb();
+checkExpiry();
+syncNative();
+</script>
+</body>
+</html>
